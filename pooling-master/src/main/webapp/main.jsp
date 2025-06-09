@@ -1,5 +1,4 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,22 +31,30 @@
             margin-bottom: 10px;
             color: #0d6efd;
         }
+        .navbar-nav {
+            margin-left: auto;
+        }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-light bg-white shadow-sm px-4">
-    <a class="navbar-brand" href="#">
-        <img src="${pageContext.request.contextPath}/images/logo.png" alt="RideShare" class="d-inline-block align-text-top">
-    </a>
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm px-4">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+            <img src="<c:url value='/resources/images/logo.png'/>" width="100" alt="RideShare" class="d-inline-block align-text-top">
+        </a>
+        <div class="navbar-nav">
+            <a href="<c:url value='/login.jsp'/>" class="btn btn-primary">Login</a>
+        </div>
+    </div>
 </nav>
 
 <!-- Hero Section -->
 <section class="hero">
     <div class="container">
-        <h1>Welcome to RideShareX</h1>
+        <h1>Welcome to RideShare</h1>
         <p>Find nearby carpool buddies and make commuting smarter, greener, and cheaper.</p>
-        <a href="#" class="btn btn-light btn-lg mt-3">Get Started</a>
+        <a href="<c:url value='/login.jsp'/>" class="btn btn-light btn-lg mt-3">Get Started</a>
     </div>
 </section>
 

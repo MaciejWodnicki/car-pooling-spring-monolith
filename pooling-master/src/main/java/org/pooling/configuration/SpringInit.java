@@ -11,8 +11,8 @@ public class SpringInit extends AbstractAnnotationConfigDispatcherServletInitial
     protected Class<?>[] getRootConfigClasses() {
         return new Class[]{org.pooling.configuration.SecurityConfiguration.class,
                 SpringConfiguration.class,
-                org.example.configuration.HibernatePersistenceConfiguration.class,
-                org.example.configuration.EmailManagerConfiguration.class};
+                org.pooling.configuration.HibernatePersistenceConfiguration.class,
+                org.pooling.configuration.EmailManagerConfiguration.class};
     }
 
     protected Class<?>[] getServletConfigClasses() {

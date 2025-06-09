@@ -1,4 +1,4 @@
-package org.example.configuration;
+package org.pooling.configuration;
 
 
 import jakarta.persistence.EntityManagerFactory;
@@ -46,7 +46,7 @@ public class HibernatePersistenceConfiguration {
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
         factoryBean.setDataSource(dataSource());
-        factoryBean.setPackagesToScan(new String []{"org.example"});
+        factoryBean.setPackagesToScan(new String []{"org.pooling"});
 
         JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         factoryBean.setJpaVendorAdapter(vendorAdapter);

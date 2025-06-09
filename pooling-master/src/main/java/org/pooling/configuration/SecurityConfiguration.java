@@ -24,42 +24,44 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 @EnableMethodSecurity
 public class SecurityConfiguration {
 
-/*
+
     @Resource(name = "myAppUserDetailsService")
     private UserDetailsService userDetailsService;
-*/
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {return new BCryptPasswordEncoder();}
 
-/*    @Bean
+    @Bean
     DaoAuthenticationProvider authProvider() {
+        System.out.println("authProvider Called!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
-    }*/
-
-    @Bean
-    public InMemoryUserDetailsManager userDetailsService() {
-        UserDetails user = User.withDefaultPasswordEncoder()
-                .username("user")
-                .password("user")
-                .roles("USER")
-                .build();
-        UserDetails admin = User.withDefaultPasswordEncoder()
-                .username("admin")
-                .password("admin")
-                .roles("ADMIN","USER")
-                .build();
-        UserDetails student = User.withDefaultPasswordEncoder()
-                .username("manager")
-                .password("manager")
-                .roles("MANAGER")
-                .build();
-        return new InMemoryUserDetailsManager(user, admin, student);
     }
-/*
+
+//    @Bean
+//    public InMemoryUserDetailsManager userDetailsService() {
+//        UserDetails user = User.withDefaultPasswordEncoder()
+//                .username("user")
+//                .password("user")
+//                .roles("USER")
+//                .build();
+//        UserDetails admin = User.withDefaultPasswordEncoder()
+//                .username("admin")
+//                .password("admin")
+//                .roles("ADMIN","USER")
+//                .build();
+//        UserDetails student = User.withDefaultPasswordEncoder()
+//                .username("manager")
+//                .password("manager")
+//                .roles("MANAGER")
+//                .build();
+//        return new InMemoryUserDetailsManager(user, admin, student);
+//    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
@@ -68,16 +70,16 @@ public class SecurityConfiguration {
         filter.setForceEncoding(true);
         http.addFilterBefore(filter, CsrfFilter.class);
 
+        System.out.println("Filter Chain Called!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
         http
                 .authorizeHttpRequests((authz) -> authz
                         .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
                         .requestMatchers("/").permitAll()
                         .requestMatchers("/appUsers*").hasAnyRole("ADMIN", "USER")
-                        .requestMatchers("/appUserRole*").hasRole("ADMIN")
-                        .requestMatchers("/exampleOne*").hasAuthority("ROLE_USER")
-                        .requestMatchers("/exampleTwo*").hasAnyAuthority("ROLE_STUDENT","ROLE_ADMIN")
-                        .requestMatchers("/exampleThree*").hasRole("USER")
+                        .requestMatchers("/availableRides").hasRole("USER") // Only for ROLE_USER
                         .requestMatchers("/appUserRest*").anonymous()
+                        .requestMatchers("/main").anonymous()
                         .requestMatchers("/login").anonymous()
                         .anyRequest().authenticated()
                 )
@@ -86,7 +88,7 @@ public class SecurityConfiguration {
                         .usernameParameter("login")
                         .passwordParameter("password")
                         .failureUrl("/login?error")
-                        .defaultSuccessUrl("/",true) //use wisely
+                        .defaultSuccessUrl("/availableRides",true) //use wisely
                         .permitAll()
                 )
                 .logout(logout -> logout
@@ -97,7 +99,7 @@ public class SecurityConfiguration {
                 )
                 .httpBasic();
         return http.build();
-    }*/
+    }
 
 }
 
