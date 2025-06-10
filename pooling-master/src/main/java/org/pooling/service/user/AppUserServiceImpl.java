@@ -9,7 +9,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class AppUserServiceImpl implements AppUserService {
@@ -73,5 +75,17 @@ public class AppUserServiceImpl implements AppUserService {
             appUserRepository.saveAndFlush(appUser);
             System.out.println(appUser.getLogin());
         });
+    }
+
+    @Override
+    public Set<AppUser> getUsersByRole(String roleName) {
+        List<AppUser> users = appUserRepository.findAll();
+        Set<AppUser> managers = new HashSet<>();
+        for (AppUser appUser : users) {
+            if (appUser.getAppUserRole().stream().findFirst().get().getRole().contains(roleName)) {
+                managers.add(appUser);
+            }
+        }
+        return managers;
     }
 }

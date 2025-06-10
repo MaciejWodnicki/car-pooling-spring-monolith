@@ -25,10 +25,4 @@ public class AppUserRoleController {
         model.addAttribute("appUserRole", new AppUserRole());
         return "appUserRole";
     }
-
-    @RequestMapping(value="/addAppUserRole", method = RequestMethod.POST)
-    public String addUserRole(@ModelAttribute("appUserRole") AppUserRole appUserRole, BindingResult result, Model model){
-        appUserRoleService.addAppUserRole(appUserRole);
-        return "redirect:/appUserRole";
-    }
 }

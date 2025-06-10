@@ -31,12 +31,31 @@
       font-weight: bold;
       color: #198754;
     }
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    .button-group {
+      display: flex;
+      gap: 10px;
+    }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h1 class="mb-4 text-primary">Available Rides</h1>
+  <div class="header-container">
+    <h1 class="text-primary">Available Rides</h1>
+    <div class="button-group">
+      <a href="<c:url value='/addRide.jsp'/>" class="btn btn-primary">Create New Ride</a>
+      <form action="<c:url value='/logout'/>" method="post">
+        <button type="submit" class="btn btn-outline-danger">Logout</button>
+        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+      </form>
+    </div>
+  </div>
 
   <c:if test="${empty ridesList}">
     <div class="alert alert-info">No rides are currently available.</div>
@@ -54,11 +73,27 @@
         <strong>Departure:</strong> ${ride.departureTime}
       </div>
       <div class="ride-detail ride-spots">
-        Available Spots: ${ride.availableSpots}
+        Available Spots: ${ride.remainingSpots}
       </div>
       <div class="mt-3">
-        <a href="rideDetails?id=${ride.id}" class="btn btn-outline-primary btn-sm">View Details</a>
-        <a href="bookRide?id=${ride.id}" class="btn btn-success btn-sm">Book Ride</a>
+        <a href="<c:url value='/availableRides/${ride.id}'/>" class="btn btn-outline-primary btn-sm">View Details</a>
+
+        <!-- Only show Book button if user is not already a passenger -->
+        <c:if test="${!ride.passengerList.contains(currentUser)}">
+          <form action="/availableRides/${ride.id}/passengers" method="POST" style="display: inline;">
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+            <button type="submit" class="btn btn-success btn-sm">Book Ride</button>
+          </form>
+        </c:if>
+
+        <!-- Only show Unbook button if user is already a passenger -->
+        <c:if test="${ride.passengerList.contains(currentUser)}">
+          <form action="/availableRides/${ride.id}/passengers" method="POST" style="display: inline;">
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+            <input type="hidden" name="_method" value="DELETE"/>
+            <button type="submit" class="btn btn-danger btn-sm">Unbook Ride</button>
+          </form>
+        </c:if>
       </div>
     </div>
   </c:forEach>

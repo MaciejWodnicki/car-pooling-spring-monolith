@@ -5,6 +5,8 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.DispatcherType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,8 +18,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.web.filter.CharacterEncodingFilter;
+import org.springframework.web.filter.HiddenHttpMethodFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -42,26 +46,6 @@ public class SecurityConfiguration {
         return authProvider;
     }
 
-//    @Bean
-//    public InMemoryUserDetailsManager userDetailsService() {
-//        UserDetails user = User.withDefaultPasswordEncoder()
-//                .username("user")
-//                .password("user")
-//                .roles("USER")
-//                .build();
-//        UserDetails admin = User.withDefaultPasswordEncoder()
-//                .username("admin")
-//                .password("admin")
-//                .roles("ADMIN","USER")
-//                .build();
-//        UserDetails student = User.withDefaultPasswordEncoder()
-//                .username("manager")
-//                .password("manager")
-//                .roles("MANAGER")
-//                .build();
-//        return new InMemoryUserDetailsManager(user, admin, student);
-//    }
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
@@ -70,17 +54,22 @@ public class SecurityConfiguration {
         filter.setForceEncoding(true);
         http.addFilterBefore(filter, CsrfFilter.class);
 
-        System.out.println("Filter Chain Called!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-
         http
                 .authorizeHttpRequests((authz) -> authz
                         .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
                         .requestMatchers("/").permitAll()
-                        .requestMatchers("/appUsers*").hasAnyRole("ADMIN", "USER")
-                        .requestMatchers("/availableRides").hasRole("USER") // Only for ROLE_USER
-                        .requestMatchers("/appUserRest*").anonymous()
+                        .requestMatchers("/appUsers*").hasAnyRole("ADMIN", "MANAGER")
+                        .requestMatchers("/availableRides/**").hasAnyRole("ADMIN", "USER", "MANAGER")
+                        .requestMatchers(HttpMethod.PUT,"/availableRides/**").hasAnyRole("ADMIN", "USER", "MANAGER")
+                        .requestMatchers(HttpMethod.DELETE,"/availableRides/**").hasAnyRole("ADMIN", "USER", "MANAGER")
+                        .requestMatchers("/addRide*").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers("/appUserRest*").hasAnyRole("ADMIN", "MANAGER")
+                        .requestMatchers("/rideRest*").hasAnyRole("ADMIN", "USER", "MANAGER")
+                        .requestMatchers("/register.jsp").anonymous()
+                        .requestMatchers(HttpMethod.POST,"/addAppUser").anonymous()
                         .requestMatchers("/main").anonymous()
                         .requestMatchers("/login").anonymous()
+                        .requestMatchers("/resources/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -88,17 +77,22 @@ public class SecurityConfiguration {
                         .usernameParameter("login")
                         .passwordParameter("password")
                         .failureUrl("/login?error")
-                        .defaultSuccessUrl("/availableRides",true) //use wisely
+                        .defaultSuccessUrl("/",true) //use wisely
                         .permitAll()
                 )
                 .logout(logout -> logout
-                        .logoutSuccessUrl("/login?logout")
+                        .logoutSuccessUrl("/")
                 )
                 .exceptionHandling(logout -> logout
                         .accessDeniedPage("/accessDenied")
                 )
                 .httpBasic();
         return http.build();
+    }
+
+    @Bean
+    public HiddenHttpMethodFilter hiddenHttpMethodFilter() {
+        return new HiddenHttpMethodFilter();
     }
 
 }

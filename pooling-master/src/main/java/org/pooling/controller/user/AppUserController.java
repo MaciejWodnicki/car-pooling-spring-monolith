@@ -1,6 +1,9 @@
 package org.pooling.controller.user;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.pooling.domain.user.Address;
 import org.pooling.domain.user.AppUser;
@@ -44,6 +47,9 @@ public class AppUserController {
     @Autowired
     private EmailService emailService;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     @Autowired
     public AppUserController(AppUserService appUserService) {
         this.appUserService = appUserService;
@@ -76,6 +82,7 @@ public class AppUserController {
     }
 
     @RequestMapping(value = "/addAppUser", method = RequestMethod.POST)
+    @Transactional
     public String addAppUser(@Valid @ModelAttribute("appUser") AppUser appUser,
                              BindingResult result,
                              Model model,
@@ -95,29 +102,34 @@ public class AppUserController {
                     ", Country: " + addr.getCountry());
         }
 
-        // Optional: Validate address manually (if needed)
-        // addressValidator.validate(appUser.getAddress(), result);
+        // 1. Save the address first (if it doesn't exist)
+        Address existingAddress = addressService.getAddress(addr.getId());
+        if (existingAddress != null) {
+            appUser.setAddress(existingAddress);
+        } else {
+            addressService.addAddress(addr);
+        }
 
-        // Force role to ROLE_USER regardless of form input
+        // 2. Set default ROLE_USER (ID=0) but check if user already exists
+        AppUser existingUser = appUserService.findByLogin(appUser.getLogin());
+        if (existingUser != null) {
+            // Handle case where user already exists
+            model.addAttribute("error", "User with this login already exists");
+            return "register"; // Return to registration page with error
+        }
+
+        // 3. Create new user with default role
         Set<AppUserRole> roles = new HashSet<>();
-        roles.add(appUserRoleService.getAppUserRole(0));
+        AppUserRole userRole = appUserRoleService.getAppUserRole(0);
+        roles.add(userRole);
         appUser.setAppUserRole(roles);
 
-        model.addAttribute("appUser", appUser);
-        addressService.addAddress(addr);
+        // 4. Save the new user
         appUserService.addAppUser(appUser);
 
-//        if (result.getErrorCount() == 0) {
-//            if (appUser.getId() == 0)
-//            else
-//                appUserService.editAppUser(appUser);
-//
-//            // Optionally send email here
-//            // emailService.sendEmail(appUser.getEmail(), "Welcome", "Account created");
-//
-//            return "redirect:register";
-//        }
-
+        // 5. Clear any persistence context to prevent caching issues
+        entityManager.flush();
+        entityManager.clear();
 
         return "availableRides";
     }
@@ -126,6 +138,14 @@ public class AppUserController {
     public String deleteUser(@PathVariable("appUserId") Long appUserId) {
         appUserService.removeAppUser(appUserId);
         return "redirect:/appUsers";
+    }
+
+    @RequestMapping(value = "/managerList")
+    public String showManagers(Model model) {
+        // Get all users with MANAGER role
+        Set<AppUser> managers = appUserService.getUsersByRole("MANAGER");
+        model.addAttribute("managerList", managers);
+        return "managerList"; // This will resolve to managerList.jsp
     }
 
 }

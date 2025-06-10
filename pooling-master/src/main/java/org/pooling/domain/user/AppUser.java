@@ -5,7 +5,10 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.pooling.domain.business.Ride;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -51,6 +54,11 @@ public class AppUser {
 
     @ManyToOne
     private Address address;
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "passengers")
+    private Set<Ride> rides = new HashSet<>();
+
 
     public long getId() {
         return id;
@@ -117,6 +125,18 @@ public class AppUser {
     }
     public void setAddress(Address address) {
         this.address = address;
+    }
+
+    public boolean joinRide(Ride ride) {
+        return ride.addPassenger(this);
+    }
+
+    public boolean leaveRide(Ride ride) {
+        return ride.removePassenger(this);
+    }
+
+    public Set<Ride> getRides() {
+        return rides;
     }
 }
 

@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -34,6 +35,10 @@
         .navbar-nav {
             margin-left: auto;
         }
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
     </style>
 </head>
 <body>
@@ -44,7 +49,25 @@
             <img src="<c:url value='/resources/images/logo.png'/>" width="100" alt="RideShare" class="d-inline-block align-text-top">
         </a>
         <div class="navbar-nav">
-            <a href="<c:url value='/login.jsp'/>" class="btn btn-primary">Login</a>
+            <c:choose>
+                <c:when test="${pageContext.request.userPrincipal != null}">
+                    <div class="button-group">
+                        <sec:authorize access="hasAnyRole('MANAGER', 'ADMIN')">
+                            <a href="<c:url value='/appUsers'/>" class="btn btn-outline-secondary me-2">Manage Users</a>
+                        </sec:authorize>
+                        <sec:authorize access="hasRole('ADMIN')">
+                            <a href="<c:url value='/managerList'/>" class="btn btn-outline-dark me-2">Manage Managers</a>
+                        </sec:authorize>
+                        <form action="<c:url value='/logout'/>" method="post">
+                            <button type="submit" class="btn btn-danger">Logout</button>
+                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                        </form>
+                    </div>
+                </c:when>
+                <c:otherwise>
+                    <a href="<c:url value='/login.jsp'/>" class="btn btn-primary">Login</a>
+                </c:otherwise>
+            </c:choose>
         </div>
     </div>
 </nav>
@@ -54,7 +77,14 @@
     <div class="container">
         <h1>Welcome to RideShare</h1>
         <p>Find nearby carpool buddies and make commuting smarter, greener, and cheaper.</p>
-        <a href="<c:url value='/login.jsp'/>" class="btn btn-light btn-lg mt-3">Get Started</a>
+        <c:choose>
+            <c:when test="${pageContext.request.userPrincipal != null}">
+                <a href="<c:url value='/availableRides'/>" class="btn btn-light btn-lg mt-3">View Available Rides</a>
+            </c:when>
+            <c:otherwise>
+                <a href="<c:url value='/login.jsp'/>" class="btn btn-light btn-lg mt-3">Get Started</a>
+            </c:otherwise>
+        </c:choose>
     </div>
 </section>
 

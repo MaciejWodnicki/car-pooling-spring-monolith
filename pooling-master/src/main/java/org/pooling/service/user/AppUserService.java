@@ -5,9 +5,10 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
+import java.util.Set;
+
 public interface AppUserService {
 
-    @Secured("ROLE_ADMIN")
     public void addAppUser(AppUser appUser);
 
     @PreAuthorize("hasRole('ROLE_ADMIN') OR (#appUser.login == principal.username)")
@@ -21,4 +22,6 @@ public interface AppUserService {
     AppUser findByLogin(String login);
 
     void activateInactiveAppUsers();
+
+    Set<AppUser> getUsersByRole(String manager);
 }

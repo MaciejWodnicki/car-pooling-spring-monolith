@@ -1,8 +1,7 @@
-package org.pooling.service;
+package org.pooling.service.user;
 
 import org.pooling.domain.user.AppUser;
 import org.pooling.domain.user.AppUserRole;
-import org.pooling.service.user.AppUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
