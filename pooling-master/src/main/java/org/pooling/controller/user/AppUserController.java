@@ -12,17 +12,13 @@ import org.pooling.service.*;
 import org.pooling.service.user.AddressService;
 import org.pooling.service.user.AppUserRoleService;
 import org.pooling.service.user.AppUserService;
-import org.pooling.service.user.EmailService;
 import org.pooling.validator.AppUserValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.ServletRequestUtils;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -42,10 +38,14 @@ public class AppUserController {
 
     // injected by constructor
     private AppUserService appUserService;
+
     @Autowired
-    private ReCaptchaService reCaptchaService;
+    private TokenService tokenService;
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private ReCaptchaService reCaptchaService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -81,60 +81,8 @@ public class AppUserController {
         return "appUser";
     }
 
-    @RequestMapping(value = "/addAppUser", method = RequestMethod.POST)
-    @Transactional
-    public String addAppUser(@Valid @ModelAttribute("appUser") AppUser appUser,
-                             BindingResult result,
-                             Model model,
-                             HttpServletRequest request) {
 
-        System.out.println("First Name: " + appUser.getFirstName() +
-                " Last Name: " + appUser.getLastName() +
-                " Tel.: " + appUser.getTelephone() +
-                " Email: " + appUser.getEmail());
-
-        Address addr = appUser.getAddress();
-        if (addr != null) {
-            System.out.println("Address -> Street: " + addr.getStreet() +
-                    ", City: " + addr.getCity() +
-                    ", State: " + addr.getState() +
-                    ", ZIP: " + addr.getZip() +
-                    ", Country: " + addr.getCountry());
-        }
-
-        // 1. Save the address first (if it doesn't exist)
-        Address existingAddress = addressService.getAddress(addr.getId());
-        if (existingAddress != null) {
-            appUser.setAddress(existingAddress);
-        } else {
-            addressService.addAddress(addr);
-        }
-
-        // 2. Set default ROLE_USER (ID=0) but check if user already exists
-        AppUser existingUser = appUserService.findByLogin(appUser.getLogin());
-        if (existingUser != null) {
-            // Handle case where user already exists
-            model.addAttribute("error", "User with this login already exists");
-            return "register"; // Return to registration page with error
-        }
-
-        // 3. Create new user with default role
-        Set<AppUserRole> roles = new HashSet<>();
-        AppUserRole userRole = appUserRoleService.getAppUserRole(0);
-        roles.add(userRole);
-        appUser.setAppUserRole(roles);
-
-        // 4. Save the new user
-        appUserService.addAppUser(appUser);
-
-        // 5. Clear any persistence context to prevent caching issues
-        entityManager.flush();
-        entityManager.clear();
-
-        return "availableRides";
-    }
-
-    @RequestMapping("/delete/{appUserId}")
+    @DeleteMapping("/appUsers/{appUserId}")
     public String deleteUser(@PathVariable("appUserId") Long appUserId) {
         appUserService.removeAppUser(appUserId);
         return "redirect:/appUsers";
@@ -146,6 +94,67 @@ public class AppUserController {
         Set<AppUser> managers = appUserService.getUsersByRole("MANAGER");
         model.addAttribute("managerList", managers);
         return "managerList"; // This will resolve to managerList.jsp
+    }
+
+    @RequestMapping(value = "/addAppUser", method = RequestMethod.POST)
+    @Transactional
+    public String addAppUser(@Valid @ModelAttribute("appUser") AppUser appUser,
+                             BindingResult result,
+                             Model model,
+                             HttpServletRequest request) {
+
+        // Check for existing user
+        if (appUserService.findByLogin(appUser.getLogin()) != null) {
+            model.addAttribute("error", "User with this login already exists");
+            return "register";
+        }
+
+        Address address = appUser.getAddress();
+        if (address != null) {
+            Address existingAddress = addressService.getAddress(address.getId());
+            if (existingAddress != null) {
+                appUser.setAddress(existingAddress);
+            } else {
+                addressService.addAddress(address);
+            }
+        }
+
+        //Generate confirmation token tied to email
+        String token = tokenService.generateToken(appUser.getEmail());
+        System.out.println("token: " + token);
+        // Store appUser temporarily (in tokenService or a cache/database)
+        tokenService.storePendingUser(token, appUser); // You must implement this
+
+        // Send email
+        String confirmationLink = "http://localhost:8080/confirm?token=" + token;
+        emailService.sendEmail(appUser.getEmail(), confirmationLink, "App User Registration");
+
+        return "registrationSuccess";
+    }
+
+    @GetMapping("/confirm")
+    @Transactional
+    public String confirmRegistration(@RequestParam("token") String token) {
+        if (!tokenService.validateToken(token)) {
+            return "main"; // Invalid token
+        }
+
+        AppUser appUser = tokenService.getPendingUser(token); // Retrieve stored AppUser
+        if (appUser == null) {
+            return "main"; // User not found in temporary store
+        }
+
+        // Assign default role
+        Set<AppUserRole> roles = new HashSet<>();
+        AppUserRole userRole = appUserRoleService.getAppUserRole(0); // ROLE_USER
+        roles.add(userRole);
+        appUser.setAppUserRole(roles);
+
+        System.out.println("role:"+appUser.getAppUserRole().toString());
+        appUserService.addAppUser(appUser); // Now save to database
+        tokenService.removeToken(token);    // Clean up after confirmation
+
+        return "registrationSuccess";
     }
 
 }

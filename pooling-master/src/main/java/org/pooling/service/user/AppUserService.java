@@ -11,11 +11,10 @@ public interface AppUserService {
 
     public void addAppUser(AppUser appUser);
 
-    @PreAuthorize("hasRole('ROLE_ADMIN') OR (#appUser.login == principal.username)")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER') OR (#appUser.login == principal.username)")
     public void editAppUser(AppUser appUser);
     public List<AppUser> listAppUser();
 
-    @Secured("ROLE_ADMIN")
     public void removeAppUser(long id);
     public AppUser getAppUser(long id);
 

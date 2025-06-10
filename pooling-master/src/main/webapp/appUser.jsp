@@ -88,7 +88,7 @@
                 <sec:authorize access="hasAnyRole('ADMIN', 'MANAGER')">
                     <a href="<c:url value='/users/${user.id}/edit'/>" class="btn btn-outline-secondary btn-sm">Edit</a>
                 </sec:authorize>
-                <sec:authorize access="hasRole('ADMIN')">
+                <sec:authorize access="hasAnyRole('ADMIN', 'MANAGER')">
                     <c:choose>
                         <c:when test="${user.enabled}">
                             <a href="<c:url value='/users/${user.id}/disable'/>" class="btn btn-warning btn-sm">Disable</a>
@@ -97,8 +97,11 @@
                             <a href="<c:url value='/users/${user.id}/enable'/>" class="btn btn-success btn-sm">Enable</a>
                         </c:otherwise>
                     </c:choose>
-                    <a href="<c:url value='/users/${user.id}/delete'/>" class="btn btn-danger btn-sm"
-                       onclick="return confirm('Are you sure you want to delete this user?')">Delete</a>
+                    <form action="/appUsers/${user.id}" method="POST" class="btn btn-danger btn-sm" style="display: inline;" onclick="return confirm('Are you sure you want to delete this user?')">
+                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                        <input type="hidden" name="_method" value="DELETE"/>
+                        <button type="submit" class="btn btn-danger btn-sm">Delete user</button>
+                    </form>
                 </sec:authorize>
             </div>
         </div>

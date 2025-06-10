@@ -108,6 +108,7 @@ public class AppUser {
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
+
     public Set<AppUserRole> getAppUserRole() {
         return appUserRole;
     }

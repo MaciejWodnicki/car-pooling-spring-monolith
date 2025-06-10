@@ -69,6 +69,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST,"/addAppUser").anonymous()
                         .requestMatchers("/main").anonymous()
                         .requestMatchers("/login").anonymous()
+                        .requestMatchers("/confirm").permitAll()
                         .requestMatchers("/resources/**").permitAll()
                         .anyRequest().authenticated()
                 )

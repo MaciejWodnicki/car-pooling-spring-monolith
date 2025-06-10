@@ -30,6 +30,6 @@ public class AppUserRoleServiceImpl implements AppUserRoleService {
 
     @Transactional
     public AppUserRole getAppUserRole(long id) {
-        return appUserRoleRepository.getOne(id);
+        return appUserRoleRepository.findById(id).orElse(null);
     }
 }
