@@ -1,7 +1,9 @@
 package org.pooling.domain.user;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.validation.constraints.Pattern;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 
 @Entity
 public class Pesel {
@@ -11,6 +13,8 @@ public class Pesel {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Size(min = 11, max = 11)
+    @Pattern(regexp = "^[0-9]*$", message = "PESEL number must contain only digits")
     private String PESEL;
 
     @JsonBackReference
@@ -33,14 +37,4 @@ public class Pesel {
         this.PESEL = PESEL;
     }
 
-    /*
-    public AppUser getAppUser() {
-        return appUser;
-    }
-
-    public void setAppUser(AppUser appUser) {
-        this.appUser = appUser;
-    }
-
-     */
 }

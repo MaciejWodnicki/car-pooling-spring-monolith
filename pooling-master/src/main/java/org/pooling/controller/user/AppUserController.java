@@ -12,6 +12,7 @@ import org.pooling.service.*;
 import org.pooling.service.user.AddressService;
 import org.pooling.service.user.AppUserRoleService;
 import org.pooling.service.user.AppUserService;
+import org.pooling.validator.AddressValidator;
 import org.pooling.validator.AppUserValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -27,6 +28,7 @@ import java.util.Set;
 public class AppUserController {
 
     private AppUserValidator appUserValidator = new AppUserValidator();
+    private AddressValidator addressValidator = new AddressValidator();
 
     // injected by field
     @Autowired
@@ -103,20 +105,31 @@ public class AppUserController {
                              Model model,
                              HttpServletRequest request) {
 
-        // Check for existing user
-        if (appUserService.findByLogin(appUser.getLogin()) != null) {
-            model.addAttribute("error", "User with this login already exists");
+        appUserValidator.validate(appUser, result);
+
+        // Handle address properly for many-to-one
+        Address submittedAddress = appUser.getAddress();
+        if (submittedAddress == null) {
+            result.rejectValue("address", "field.required", "Address is required");
             return "register";
         }
 
-        Address address = appUser.getAddress();
-        if (address != null) {
-            Address existingAddress = addressService.getAddress(address.getId());
-            if (existingAddress != null) {
-                appUser.setAddress(existingAddress);
-            } else {
-                addressService.addAddress(address);
+        // Check if address already exists in database
+        Address existingAddress = addressService.getAddress(submittedAddress.getId());
+
+        if (existingAddress != null) {
+            // Use existing address
+            appUser.setAddress(existingAddress);
+        } else {
+            // Validate and save new address
+            addressValidator.validate(submittedAddress, result);
+            if (!result.hasErrors()) {
+                addressService.addAddress(submittedAddress);
             }
+        }
+
+        if (result.hasErrors()) {
+            return "register";
         }
 
         //Generate confirmation token tied to email

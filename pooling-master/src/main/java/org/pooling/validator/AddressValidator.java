@@ -14,11 +14,11 @@ public class AddressValidator implements Validator {
 
     @Override
     public void validate(Object target, Errors errors) {
-        ValidationUtils.rejectIfEmpty(errors, "street", "error.field.required");
-        ValidationUtils.rejectIfEmpty(errors, "city", "error.field.required");
-        ValidationUtils.rejectIfEmpty(errors, "state", "error.field.required");
-        ValidationUtils.rejectIfEmpty(errors, "zip", "error.field.required");
-        ValidationUtils.rejectIfEmpty(errors, "country", "error.field.required");
+        ValidationUtils.rejectIfEmpty(errors, "address.street", "error.field.required");
+        ValidationUtils.rejectIfEmpty(errors, "address.city", "error.field.required");
+        ValidationUtils.rejectIfEmpty(errors, "address.state", "error.field.required");
+        ValidationUtils.rejectIfEmpty(errors, "address.zip", "error.field.required");
+        ValidationUtils.rejectIfEmpty(errors, "address.country", "error.field.required");
 
 
     }

@@ -79,12 +79,16 @@
                 <div class="form-floating mb-3">
                     <input type="text" class="form-control" id="firstName" name="firstName" required>
                     <label for="firstName">First Name</label>
+                    <form:errors path="firstName" cssClass="text-danger" />
+
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="form-floating mb-3">
                     <input type="text" class="form-control" id="lastName" name="lastName" required>
                     <label for="lastName">Last Name</label>
+                    <form:errors path="lastName" cssClass="text-danger" />
+
                 </div>
             </div>
         </div>
@@ -92,29 +96,31 @@
         <div class="form-floating mb-3">
             <input type="email" class="form-control" id="email" name="email" required>
             <label for="email">Email Address</label>
+            <form:errors path="email" cssClass="text-danger" />
+
         </div>
 
         <div class="form-floating mb-3">
             <input type="text" class="form-control" id="username" name="login" required>
             <label for="username">Username</label>
+
         </div>
 
         <div class="form-floating mb-3">
             <input type="text" class="form-control" id="telephone" name="telephone" required>
             <label for="telephone">Phone Number</label>
+            <form:errors path="telephone" cssClass="text-danger" />
         </div>
 
         <div class="form-floating mb-3">
             <input type="text" class="form-control" id="pesel" name="pesel.PESEL" required>
             <label for="pesel">PESEL</label>
+            <form:errors path="pesel.PESEL" cssClass="text-danger" />
         </div>
 
         <div class="form-floating mb-3">
             <input type="password" class="form-control" id="password" name="password" required>
             <label for="password">Password</label>
-            <div class="password-requirements">
-                Must be at least 8 characters with a number and special character
-            </div>
         </div>
 
         <div class="form-floating mb-3">
@@ -127,30 +133,34 @@
         <div class="form-floating mb-3">
             <input type="text" class="form-control" id="street" name="address.street" required>
             <label for="street">Street</label>
+            <form:errors path="address.street" cssClass="text-danger" />
         </div>
 
         <div class="form-floating mb-3">
             <input type="text" class="form-control" id="city" name="address.city" required>
             <label for="city">City</label>
+            <form:errors path="address.city" cssClass="text-danger" />
+
         </div>
 
         <div class="form-floating mb-3">
             <input type="text" class="form-control" id="state" name="address.state" required>
             <label for="state">State</label>
+            <form:errors path="address.state" cssClass="text-danger" />
+
         </div>
 
         <div class="form-floating mb-3">
             <input type="text" class="form-control" id="zip" name="address.zip" title="ZIP code must be 6 digits">
             <label for="zip">ZIP Code</label>
+            <form:errors path="address.zip" cssClass="text-danger" />
         </div>
 
         <div class="form-floating mb-3">
             <input type="text" class="form-control" id="country" name="address.country" required>
             <label for="country">Country</label>
+            <form:errors path="address.country" cssClass="text-danger" />
         </div>
-
-        <!-- Always assign ROLE_USER -->
-        <input type="hidden" name="appUserRole" value="ROLE_USER" />
 
         <!-- Optional: Set enabled=true by default -->
         <input type="hidden" name="enabled" value="true" />

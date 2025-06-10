@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import org.pooling.domain.business.Ride;
 
@@ -33,6 +34,7 @@ public class AppUser {
     private String email;
 
     @Size(min=9, max=9)
+    @Pattern(regexp = "^[0-9]*$", message = "Telephone number must contain only digits")
     private String telephone;
 
     @NotNull
@@ -59,6 +61,9 @@ public class AppUser {
     @ManyToMany(mappedBy = "passengers")
     private Set<Ride> rides = new HashSet<>();
 
+    public AppUser() {
+        this.address = new Address();
+    }
 
     public long getId() {
         return id;
