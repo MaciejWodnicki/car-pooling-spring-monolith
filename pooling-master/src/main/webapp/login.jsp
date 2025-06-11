@@ -78,7 +78,7 @@
 
   <form name="loginForm" action="<c:url value='/login'/>" method="POST">
     <div class="mb-3">
-      <label for="login" class="form-label">Username or Email</label>
+      <label for="login" class="form-label">Username</label>
       <input type="text" class="form-control" id="login" name="login" required autofocus>
     </div>
 

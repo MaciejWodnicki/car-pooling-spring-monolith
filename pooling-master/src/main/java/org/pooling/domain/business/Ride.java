@@ -21,6 +21,9 @@ public class Ride {
     private String driverName;
 
     @NotNull
+    private String driverTelephone;
+
+    @NotNull
     private String origin;
 
     @NotNull
@@ -42,12 +45,12 @@ public class Ride {
     private Set<AppUser> passengers = new HashSet<>();
 
     // Constructors
-    public Ride() {
-    }
+    public Ride() {}
 
-    public Ride(String driverName, String origin, String destination,
+    public Ride(String driverName, String driverTelephone, String origin, String destination,
                 LocalDateTime departureTime, int availableSpots) {
         this.driverName = driverName;
+        this.driverTelephone = driverTelephone;
         this.origin = origin;
         this.destination = destination;
         this.departureTime = departureTime;
@@ -154,5 +157,13 @@ public class Ride {
     @Override
     public String toString() {
         return getRideDetails() + "\n" + getPassengerList();
+    }
+
+    public String getDriverTelephone() {
+        return driverTelephone;
+    }
+
+    public void setDriverTelephone(String driverTelephone) {
+        this.driverTelephone = driverTelephone;
     }
 }

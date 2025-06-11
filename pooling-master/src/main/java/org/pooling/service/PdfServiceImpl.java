@@ -6,6 +6,7 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import jakarta.servlet.http.HttpServletResponse;
+import org.pooling.domain.business.Ride;
 import org.pooling.domain.user.AppUser;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +38,37 @@ public class PdfServiceImpl implements PdfService {
             table.addCell("Email");
             table.addCell (appUser.getEmail()); table.addCell("Active");
             table.addCell(String.valueOf(appUser.isEnabled()));
+            pdf.add(table);
+            pdf.close();
+            o.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+    public void generatePdf(Ride ride, HttpServletResponse response) {
+        try{
+
+            OutputStream o = response.getOutputStream(); response.setCharacterEncoding("UTF-8");
+            response.setContentType("application/pdf");
+            response.setHeader("Content-Disposition", "inline; filename="+ride.getDestination() + ".pdf");
+            Document pdf = new Document();
+            PdfWriter.getInstance(pdf, o);
+            pdf.open();
+            pdf.add(new Paragraph("Pdf example Spring Framework & iText library"));
+            pdf.add(new Paragraph (Chunk. NEWLINE));
+            PdfPTable table = new PdfPTable (2);
+            table.addCell("Origin");
+            table.addCell (ride.getOrigin());
+            table.addCell("Destination");
+            table.addCell(ride.getDestination());
+            table.addCell("Departure time");
+            table.addCell(ride.getDepartureTime().toString());
+            table.addCell("Driver Name:");
+            table.addCell (ride.getDriverName());
+            table.addCell("Driver telephone");
+            table.addCell (ride.getDriverTelephone());
             pdf.add(table);
             pdf.close();
             o.close();

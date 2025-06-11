@@ -1,6 +1,10 @@
 package org.pooling.controller.business;
 
+import com.sun.mail.iap.Response;
+import jakarta.servlet.http.HttpServletResponse;
+import org.eclipse.tags.shaded.org.apache.xpath.operations.Bool;
 import org.pooling.domain.business.Ride;
+import org.pooling.service.PdfService;
 import org.pooling.service.business.RideService;
 import org.pooling.service.user.AppUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +20,13 @@ public class RideController {
 
     private final RideService rideService;
     private final AppUserService appUserService;
+    private final PdfService pdfService;
 
     @Autowired
-    public RideController(RideService rideService, AppUserService appUserService) {
+    public RideController(RideService rideService, AppUserService appUserService, PdfService pdfService) {
         this.rideService = rideService;
         this.appUserService = appUserService;
+        this.pdfService = pdfService;
     }
 
     @GetMapping("/availableRides")
@@ -56,9 +62,13 @@ public class RideController {
     }
 
     @PostMapping("/availableRides/{id}/passengers")
-    public String addPassenger(@PathVariable("id") long id, Principal principal) {
-        rideService.addUserToRide(id, appUserService.findByLogin(principal.getName()).getId());
-        System.out.println("added passenger1");
+    public String addPassenger(@PathVariable("id") long id, Principal principal, HttpServletResponse response) {
+        Boolean result = rideService.addUserToRide(id, appUserService.findByLogin(principal.getName()).getId());
+
+        if(result){
+            System.out.println("added passenger1");
+            pdfService.generatePdf(rideService.getRide(id), response);
+        }
 
         return "redirect:/availableRides";
     }

@@ -1,6 +1,7 @@
 package org.pooling.service.business;
 
 import jakarta.transaction.Transactional;
+import org.eclipse.tags.shaded.org.apache.xpath.operations.Bool;
 import org.pooling.domain.business.Ride;
 import org.pooling.repository.business.RideRepository;
 import org.pooling.repository.user.AppUserRepository;
@@ -47,8 +48,8 @@ public class RideServiceImpl implements RideService{
     }
 
     @Override
-    public void addUserToRide(long rideId, long userId) {
-        rideRepository.getReferenceById(rideId).addPassenger(appUserRepository.findById(userId));
+    public Boolean addUserToRide(long rideId, long userId) {
+        return rideRepository.getReferenceById(rideId).addPassenger(appUserRepository.findById(userId));
     }
 
     @Override

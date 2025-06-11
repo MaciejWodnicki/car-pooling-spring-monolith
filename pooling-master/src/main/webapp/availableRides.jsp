@@ -70,6 +70,9 @@
         <strong>Driver:</strong> ${ride.driverName}
       </div>
       <div class="ride-detail">
+        <strong>Driver Contact:</strong> ${ride.driverTelephone}
+      </div>
+      <div class="ride-detail">
         <strong>Departure:</strong> ${ride.departureTime}
       </div>
       <div class="ride-detail ride-spots">

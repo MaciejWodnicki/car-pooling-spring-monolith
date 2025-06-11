@@ -11,6 +11,6 @@ public interface RideService {
     void editRide(Ride ride);
     void removeRide(long id);
     Ride getRide(long id);
-    void addUserToRide(long rideId, long userId);
+    Boolean addUserToRide(long rideId, long userId);
     void removeUserFromRide(long rideId, long userId);
 }
