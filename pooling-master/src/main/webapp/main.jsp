@@ -46,7 +46,7 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm px-4">
     <div class="container-fluid">
         <a class="navbar-brand" href="#">
-            <img src="<c:url value='/resources/images/logo.png'/>" width="100" alt="RideShare" class="d-inline-block align-text-top">
+            <img src="<c:url value='/resources/images/logo.png'/>" width="100" alt="RideShareX" class="d-inline-block align-text-top">
         </a>
         <div class="navbar-nav">
             <c:choose>
@@ -75,7 +75,7 @@
 <!-- Hero Section -->
 <section class="hero">
     <div class="container">
-        <h1>Welcome to RideShare</h1>
+        <h1>Welcome to RideShareX</h1>
         <p>Find nearby carpool buddies and make commuting smarter, greener, and cheaper.</p>
         <c:choose>
             <c:when test="${pageContext.request.userPrincipal != null}">
