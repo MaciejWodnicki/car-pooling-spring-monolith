@@ -15,37 +15,50 @@ import java.net.URL;
 @Service
 public class ReCaptchaServiceImpl implements ReCaptchaService {
     private static final String URL = "https://www.google.com/recaptcha/api/siteverify";
-    private static final String GOOGLE_KEY = "6LeaeSErAAAAAJJ8MB_ZXR3GfNAYK16dkePxLTIH";
+    private static final String GOOGLE_KEY = "6Lc0QFwrAAAAANtxMHB6rzNpjPd49cN4Ki1AQNrD";
 
 
 
     @Override
     public boolean verify(String captcha) {
-        if (captcha == null || "".equals(captcha)) return false;
+        if (captcha == null || captcha.isEmpty()) return false;
+
         try {
             URL obj = new URL(URL);
             HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
             con.setRequestMethod("POST");
-            String postParams = "secret=" + GOOGLE_KEY + "&response=" + captcha; // Send post request
+
+            String postParams = "secret=" + GOOGLE_KEY + "&response=" + captcha;
             con.setDoOutput(true);
-            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-            wr.writeBytes(postParams);
-            wr.flush();
-            wr.close();
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
+            try (DataOutputStream wr = new DataOutputStream(con.getOutputStream())) {
+                wr.writeBytes(postParams);
+                wr.flush();
             }
-            response.append(inputLine);
-            in.close();
-            JsonReader jsonReader = Json.createReader(new StringReader(response.toString()));
+
+            StringBuilder response = new StringBuilder();
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()))) {
+                String inputLine;
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine); // ✅ Append inside the loop
+                }
+            }
+
+            String jsonResponse = response.toString();
+            if (jsonResponse == null || jsonResponse.trim().isEmpty()) {
+                System.err.println("Empty JSON response from reCAPTCHA");
+                return false;
+            }
+
+            JsonReader jsonReader = Json.createReader(new StringReader(jsonResponse));
             JsonObject jsonObject = jsonReader.readObject();
             jsonReader.close();
-            return jsonObject.getBoolean("success");
+
+            return jsonObject.getBoolean("success", false);
+
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
     }
+
 }

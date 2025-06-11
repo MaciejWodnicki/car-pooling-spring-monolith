@@ -128,7 +128,7 @@ public class AppUserController {
             }
         }
 
-        if (result.hasErrors()) {
+        if (result.hasErrors() || !reCaptchaService.verify(request.getParameter("g-recaptcha-response"))) {
             return "register";
         }
 

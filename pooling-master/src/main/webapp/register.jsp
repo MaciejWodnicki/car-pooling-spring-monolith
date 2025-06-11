@@ -7,6 +7,7 @@
     <meta charset="UTF-8">
     <title>Register - RideShareX</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://www.google.com/recaptcha/api.js"></script>
     <style>
         body {
             background-color: #f8f9fa;
@@ -162,7 +163,6 @@
             <form:errors path="address.country" cssClass="text-danger" />
         </div>
 
-        <!-- Optional: Set enabled=true by default -->
         <input type="hidden" name="enabled" value="true" />
 
         <div class="mb-3 form-check">
@@ -170,7 +170,7 @@
             <label class="form-check-label" for="terms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
         </div>
 
-<%--        <div class="g-recaptcha mb-3" data-sitekey="6LeaeSErAAAAAJI9Dqrjay9nBL71ifMkIOciLdvC"></div>--%>
+        <div class="g-recaptcha mb-3" data-sitekey="6Lc0QFwrAAAAANh0Tl05etUi_t2VxgdmF5aV2CoE"></div>
 
         <button type="submit" class="btn btn-primary w-100 py-2">Create Account</button>
 

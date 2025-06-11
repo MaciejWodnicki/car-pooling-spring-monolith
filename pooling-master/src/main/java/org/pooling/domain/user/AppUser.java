@@ -6,6 +6,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import org.hibernate.action.internal.OrphanRemovalAction;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.pooling.domain.business.Ride;
 
 import java.util.Collection;
@@ -59,6 +62,7 @@ public class AppUser {
 
     @JsonIgnore
     @ManyToMany(mappedBy = "passengers")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Ride> rides = new HashSet<>();
 
     public AppUser() {
